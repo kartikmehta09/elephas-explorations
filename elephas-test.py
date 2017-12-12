@@ -27,6 +27,9 @@ from pyspark import SparkContext, SparkConf
 from sklearn.metrics import accuracy_score
 import numpy as np
 import argparse
+import time
+
+start_time = time.time()
 
 #---function for building the model
 #---adopted from https://github.com/cartopy/keras-0.3.3/blob/master/examples/mnist_cnn.py
@@ -81,6 +84,7 @@ model = build_model()
 
 #---compile model (this step is missing in Max's code)
 model.compile(loss='categorical_crossentropy', optimizer='adam')
+model.summary()
 
 #---Build RDD from trainin examples 
 #---(i.e. in training each worker will train on part of the data)
@@ -106,4 +110,6 @@ pred = spark_model.predict(X_test)
 print np.shape(pred)
 print np.shape(y_test)
 acc = accuracy_score([np.argmax(y) for y in y_test], [ np.argmax(p) for p in pred ] )
-print "test accuracy: ", acc
+print "--->test accuracy: ", acc
+print "--->number of workers: ",args.N_workers
+print "--->time: ", time.time()-start_time
